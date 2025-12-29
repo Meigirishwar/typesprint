@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const wordCountSelect = document.getElementById("word-count");
 
   /* =========================
-     INITIAL UI STATE
+     INITIAL UI
   ========================= */
   resultPage.classList.add("hidden");
   appContainer.classList.remove("hidden");
@@ -42,8 +42,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let isRunning = false;
   let timer = null;
   let timeLeft = 60;
-  let currentIndex = 0;
 
+  let currentIndex = 0;
   let correct = 0;
   let incorrect = 0;
 
@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =========================
-     START TEST (AUTO)
+     START TEST
   ========================= */
   function startTest() {
     if (isRunning) return;
@@ -108,11 +108,13 @@ document.addEventListener("DOMContentLoaded", () => {
     isRunning = true;
     restartBtn.style.display = "inline-block";
 
-    timer = setInterval(() => {
-      timeLeft--;
-      timeDisplay.textContent = timeLeft;
-      if (timeLeft <= 0) endTest();
-    }, 1000);
+    if (mode === "time") {
+      timer = setInterval(() => {
+        timeLeft--;
+        timeDisplay.textContent = timeLeft;
+        if (timeLeft <= 0) endTest();
+      }, 1000);
+    }
   }
 
   /* =========================
@@ -122,24 +124,35 @@ document.addEventListener("DOMContentLoaded", () => {
     clearInterval(timer);
     isRunning = false;
 
-    const total = correct + incorrect;
-    const accuracy = total === 0 ? 0 : Math.round((correct / total) * 100);
-    const wpm = Math.round((correct / 5));
+    const totalTyped = correct + incorrect;
+    const accuracy =
+      totalTyped === 0 ? 0 : Math.round((correct / totalTyped) * 100);
+
+    const minutes =
+      mode === "time" ? 60 / 60 : (Date.now() - startTime) / 60000;
+
+    const wpm =
+      minutes > 0 ? Math.round((correct / 5) / minutes) : 0;
 
     resultWpm.textContent = wpm;
     resultAccuracy.textContent = accuracy + "%";
     charSummary.textContent = `${correct} / ${incorrect} / 0 / 0`;
-    resultTime.textContent = "60s";
+    resultTime.textContent = mode === "time" ? "60s" : "-";
 
     appContainer.classList.add("hidden");
     resultPage.classList.remove("hidden");
   }
 
+  let startTime = 0;
+
   /* =========================
      KEY HANDLER
   ========================= */
   window.addEventListener("keydown", (e) => {
-    if (!isRunning) startTest();
+    if (!isRunning) {
+      startTime = Date.now();
+      startTest();
+    }
 
     const chars = typingText.querySelectorAll(".char");
 
@@ -176,9 +189,15 @@ document.addEventListener("DOMContentLoaded", () => {
     currentChar.classList.remove("current");
     currentIndex++;
 
-    // END TEST WHEN LAST CHARACTER TYPED (WORDS MODE FIX)
-    if (currentIndex === currentText.length) {
+    // WORDS MODE: END AT LAST CHARACTER
+    if (mode === "words" && currentIndex === currentText.length) {
       endTest();
+      return;
+    }
+
+    // TIME MODE: LOAD NEW SENTENCE
+    if (mode === "time" && currentIndex === currentText.length) {
+      loadText();
       return;
     }
 
@@ -198,6 +217,12 @@ document.addEventListener("DOMContentLoaded", () => {
     isRunning = false;
     loadText();
   });
+
+  /* =========================
+     SETTINGS CHANGE → RELOAD
+  ========================= */
+  modeRadios.forEach(r => r.addEventListener("change", loadText));
+  wordCountSelect.addEventListener("change", loadText);
 
   /* =========================
      INIT
