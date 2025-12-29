@@ -1,4 +1,6 @@
+console.log("script.js loaded");
 document.addEventListener("DOMContentLoaded", () => {
+
 
   // =========================
   // DOM Elements
@@ -52,7 +54,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     timeLeft = 60;
     timeDisplay.textContent = timeLeft;
+    timer = setInterval(() => {
+  timeLeft--;
+  timeDisplay.textContent = timeLeft;
 
+  if (timeLeft <= 0) {
+    endTest();
+  }
+}, 1000);
     console.log("Test started:", currentMode, currentDifficulty);
   }
 
@@ -77,6 +86,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     console.log("Test reset");
   }
+  function endTest() {
+  isTestRunning = false;
+  clearInterval(timer);
+
+  typingInput.disabled = true;
+  startBtn.disabled = false;
+  restartBtn.disabled = true;
+
+  console.log("Test ended");
+}
+
 
   // =========================
   // Events
