@@ -3,30 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <title>TypeSprint</title>
+
+  <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  >
 
+  <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
+  <!-- HEADER -->
   <header class="app-header">
     <h1>TypeSprint</h1>
   </header>
 
+  <!-- MAIN APP -->
   <main class="app-container">
 
-    <!-- Controls -->
+    <!-- CONTROLS -->
     <section class="controls">
       <div class="mode-select">
         <label>
           <input type="radio" name="mode" value="time" checked>
-          Time Mode
+          Time
         </label>
         <label>
-          <input type="radio" name="mode" value="paragraph">
-          Paragraph Mode
+          <input type="radio" name="mode" value="words">
+          Words
         </label>
       </div>
 
@@ -42,34 +51,70 @@
       </div>
     </section>
 
-    <!-- Timer -->
+    <!-- TIMER -->
     <section class="timer">
       <span>Time:</span>
       <strong id="time">60</strong>s
     </section>
 
-    <!-- Typing Text (Monkeytype-style) -->
+    <!-- TYPING AREA -->
     <section class="typing-area">
-      <div id="typing-text" class="typing-text" tabindex="0">
+      <div
+        id="typing-text"
+        class="typing-text"
+        tabindex="0"
+        aria-label="Typing test area"
+      >
         Loading text...
       </div>
     </section>
 
-    <!-- Stats -->
-    <section class="stats">
-      <div>WPM: <span id="wpm">0</span></div>
-      <div>Accuracy: <span id="accuracy">0%</span></div>
-    </section>
-
-    <!-- Actions -->
+    <!-- ACTION BUTTONS -->
     <section class="actions">
-      <button id="start-btn">Start Test</button>
-      <button id="restart-btn" disabled>Restart</button>
+        <button id="restart-btn" disabled>Restart</button>
     </section>
 
   </main>
 
-  <!-- JavaScript -->
+  <!-- RESULT PAGE -->
+  <section id="result-page" class="result-page hidden">
+
+    <div class="result-card">
+
+      <div class="result-main">
+        <div class="result-block">
+          <div class="label">wpm</div>
+          <div id="result-wpm" class="value">0</div>
+        </div>
+
+        <div class="result-block">
+          <div class="label">acc</div>
+          <div id="result-accuracy" class="value">0%</div>
+        </div>
+      </div>
+
+      <div class="result-secondary">
+        <div>
+          <span class="label">characters</span>
+          <span id="char-summary">0 / 0 / 0 / 0</span>
+        </div>
+
+        <div>
+          <span class="label">time</span>
+          <span id="result-time">0s</span>
+        </div>
+      </div>
+
+      <div class="result-actions">
+        <button id="retry-btn">Retry</button>
+        <button id="newtest-btn">New Test</button>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- JAVASCRIPT -->
   <script src="script.js"></script>
 
 </body>
