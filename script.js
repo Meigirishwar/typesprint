@@ -15,8 +15,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const charSummary = document.getElementById("char-summary");
   const resultTime = document.getElementById("result-time");
 
+  const modeRadios = document.querySelectorAll('input[name="mode"]');
+  const wordCountSelect = document.getElementById("word-count");
+
   /* =========================
-     INITIAL STATE
+     INITIAL UI STATE
   ========================= */
   resultPage.classList.add("hidden");
   appContainer.classList.remove("hidden");
@@ -25,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =========================
      WORD POOL
   ========================= */
-  const WORD_POOL = [ "the","be","to","of","and","a",
+    const WORD_POOL = [ "the","be","to","of","and","a",
     "in","that","have","I","it","for","not","on",
     "with","he","as","you","do","at", "this","but",
     "his","by","from","they","we","say","her","she","or",
@@ -78,22 +81,49 @@ document.addEventListener("DOMContentLoaded", () => {
   let correct = 0;
   let incorrect = 0;
 
+  let mode = "time";
+  let wordLimit = 10;
+  let typedWords = 0;
+
   /* =========================
-     HELPERS
+     SETTINGS
   ========================= */
-  function generateSentence() {
-    return Array.from({ length: 10 }, () =>
+  function updateSettings() {
+    modeRadios.forEach(radio => {
+      if (radio.checked) mode = radio.value;
+    });
+    wordLimit = parseInt(wordCountSelect.value);
+  }
+
+  /* =========================
+     TEXT GENERATION
+  ========================= */
+  function generateWords(count) {
+    return Array.from({ length: count }, () =>
       WORD_POOL[Math.floor(Math.random() * WORD_POOL.length)]
     ).join(" ");
   }
 
+  function generateSentence() {
+    return generateWords(12);
+  }
+
+  /* =========================
+     LOAD TEXT
+  ========================= */
   function loadText() {
+    updateSettings();
+
     typingText.innerHTML = "";
     currentIndex = 0;
     correct = 0;
     incorrect = 0;
+    typedWords = 0;
 
-    const text = generateSentence();
+    const text =
+      mode === "words"
+        ? generateWords(wordLimit)
+        : generateSentence();
 
     text.split("").forEach((char, i) => {
       const span = document.createElement("span");
@@ -120,6 +150,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 1000);
   }
 
+  /* =========================
+     END TEST
+  ========================= */
   function endTest() {
     clearInterval(timer);
     isRunning = false;
@@ -143,6 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("keydown", (e) => {
     if (!isRunning) startTest();
 
+    if (e.key.length !== 1) return;
     e.preventDefault();
 
     const chars = typingText.querySelectorAll(".char");
@@ -155,6 +189,14 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       currentChar.classList.add("incorrect");
       incorrect++;
+    }
+
+    if (e.key === " " && mode === "words") {
+      typedWords++;
+      if (typedWords >= wordLimit) {
+        endTest();
+        return;
+      }
     }
 
     currentChar.classList.remove("current");
@@ -178,7 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* =========================
-     LOAD INITIAL TEXT
+     INIT
   ========================= */
-  loadText(); // 👈 THIS IS THE KEY FIX
+  loadText();
 });
