@@ -23,6 +23,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let isTestRunning = false;
   let currentMode = "time";
   let currentDifficulty = "easy";
+  let text = "";
+  let currentCharIndex = 0;
+ 
+const sampleText =
+  "without group day man become course look while general since run which how last call set she good take little another these off";
 
   // =========================
   // Helpers
@@ -39,6 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Start Test
   // =========================
   function startTest() {
+    loadText();
     if (isTestRunning) return;
 
     isTestRunning = true;
@@ -105,3 +111,20 @@ document.addEventListener("DOMContentLoaded", () => {
   restartBtn.addEventListener("click", resetTest);
 
 });
+function loadText() {
+  textToType.innerHTML = "";
+  currentCharIndex = 0;
+  text = sampleText;
+
+  text.split("").forEach((char, index) => {
+    const span = document.createElement("span");
+    span.textContent = char;
+    span.classList.add("char");
+
+    if (index === 0) {
+      span.classList.add("current");
+    }
+
+    textToType.appendChild(span);
+  });
+}
