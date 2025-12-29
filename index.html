@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>TypeSprint</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -44,17 +48,12 @@
       <strong id="time">60</strong>s
     </section>
 
-    <!-- Text Display -->
-    <section class="text-display">
-      <p id="text-to-type">Loading text...</p>
+    <!-- Typing Text (Monkeytype-style) -->
+    <section class="typing-area">
+      <div id="typing-text" class="typing-text" tabindex="0">
+        Loading text...
+      </div>
     </section>
-
- <!-- Typing Text (Monkeytype-style) -->
-<section class="typing-area">
-  <div id="typing-text" class="typing-text">
-    <!-- Characters will be injected here by JavaScript -->
-  </div>
-</section>
 
     <!-- Stats -->
     <section class="stats">
@@ -70,7 +69,7 @@
 
   </main>
 
-  <!-- JavaScript MUST be here -->
+  <!-- JavaScript -->
   <script src="script.js"></script>
 
 </body>
