@@ -1,14 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>TypeSprint</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
+<header class="app-header">
   <h1>TypeSprint</h1>
+</header>
 
-  <script src="script.js"></script>
-</body>
-</html>
+<main class="app-container">
+
+  <!-- Controls -->
+  <section class="controls">
+    <div class="mode-select">
+      <label>
+        <input type="radio" name="mode" value="time" checked>
+        Time Mode
+      </label>
+      <label>
+        <input type="radio" name="mode" value="paragraph">
+        Paragraph Mode
+      </label>
+    </div>
+
+    <div class="difficulty-select">
+      <label>
+        Difficulty:
+        <select id="difficulty">
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+      </label>
+    </div>
+  </section>
+
+  <!-- Timer -->
+  <section class="timer">
+    <span>Time:</span>
+    <strong id="time">60</strong>s
+  </section>
+
+  <!-- Text Display -->
+  <section class="text-display">
+    <p id="text-to-type">
+      Loading text...
+    </p>
+  </section>
+
+  <!-- Typing Area -->
+  <section class="typing-area">
+    <textarea
+      id="typing-input"
+      placeholder="Start typing here..."
+      disabled
+    ></textarea>
+  </section>
+
+  <!-- Stats -->
+  <section class="stats">
+    <div>WPM: <span id="wpm">0</span></div>
+    <div>Accuracy: <span id="accuracy">0%</span></div>
+  </section>
+
+  <!-- Actions -->
+  <section class="actions">
+    <button id="start-btn">Start Test</button>
+    <button id="restart-btn" disabled>Restart</button>
+  </section>
+
+</main>
