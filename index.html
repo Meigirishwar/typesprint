@@ -1,66 +1,77 @@
-<header class="app-header">
-  <h1>TypeSprint</h1>
-</header>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TypeSprint</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-<main class="app-container">
+  <header class="app-header">
+    <h1>TypeSprint</h1>
+  </header>
 
-  <!-- Controls -->
-  <section class="controls">
-    <div class="mode-select">
-      <label>
-        <input type="radio" name="mode" value="time" checked>
-        Time Mode
-      </label>
-      <label>
-        <input type="radio" name="mode" value="paragraph">
-        Paragraph Mode
-      </label>
-    </div>
+  <main class="app-container">
 
-    <div class="difficulty-select">
-      <label>
-        Difficulty:
-        <select id="difficulty">
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
-        </select>
-      </label>
-    </div>
-  </section>
+    <!-- Controls -->
+    <section class="controls">
+      <div class="mode-select">
+        <label>
+          <input type="radio" name="mode" value="time" checked>
+          Time Mode
+        </label>
+        <label>
+          <input type="radio" name="mode" value="paragraph">
+          Paragraph Mode
+        </label>
+      </div>
 
-  <!-- Timer -->
-  <section class="timer">
-    <span>Time:</span>
-    <strong id="time">60</strong>s
-  </section>
+      <div class="difficulty-select">
+        <label>
+          Difficulty:
+          <select id="difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </label>
+      </div>
+    </section>
 
-  <!-- Text Display -->
-  <section class="text-display">
-    <p id="text-to-type">
-      Loading text...
-    </p>
-  </section>
+    <!-- Timer -->
+    <section class="timer">
+      <span>Time:</span>
+      <strong id="time">60</strong>s
+    </section>
 
-  <!-- Typing Area -->
-  <section class="typing-area">
-    <textarea
-      id="typing-input"
-      placeholder="Start typing here..."
-      disabled
-    ></textarea>
-  </section>
+    <!-- Text Display -->
+    <section class="text-display">
+      <p id="text-to-type">Loading text...</p>
+    </section>
 
-  <!-- Stats -->
-  <section class="stats">
-    <div>WPM: <span id="wpm">0</span></div>
-    <div>Accuracy: <span id="accuracy">0%</span></div>
-  </section>
+ <!-- Typing Text (Monkeytype-style) -->
+<section class="typing-area">
+  <div id="typing-text" class="typing-text">
+    <!-- Characters will be injected here by JavaScript -->
+  </div>
+</section>
 
-  <!-- Actions -->
-  <section class="actions">
-    <button id="start-btn">Start Test</button>
-    <button id="restart-btn" disabled>Restart</button>
-  </section>
+    <!-- Stats -->
+    <section class="stats">
+      <div>WPM: <span id="wpm">0</span></div>
+      <div>Accuracy: <span id="accuracy">0%</span></div>
+    </section>
 
-</main>
+    <!-- Actions -->
+    <section class="actions">
+      <button id="start-btn">Start Test</button>
+      <button id="restart-btn" disabled>Restart</button>
+    </section>
+
+  </main>
+
+  <!-- JavaScript MUST be here -->
+  <script src="script.js"></script>
+
+</body>
+</html>
