@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>TypeSprint</title>
 
-  <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -12,22 +11,19 @@
     rel="stylesheet"
   >
 
-  <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <!-- HEADER -->
   <header class="app-header">
     <h1>TypeSprint</h1>
   </header>
 
-  <!-- MAIN APP -->
   <main class="app-container">
 
-    <!-- CONTROLS -->
     <section class="controls">
+
       <div class="mode-select">
         <label>
           <input type="radio" name="mode" value="time" checked>
@@ -36,6 +32,17 @@
         <label>
           <input type="radio" name="mode" value="words">
           Words
+        </label>
+      </div>
+
+      <div class="word-count">
+        <label>
+          Words:
+          <select id="word-count">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
         </label>
       </div>
 
@@ -49,15 +56,14 @@
           </select>
         </label>
       </div>
+
     </section>
 
-    <!-- TIMER -->
-    <section class="timer">
+    <section id="timer" class="timer">
       <span>Time:</span>
       <strong id="time">60</strong>s
     </section>
 
-    <!-- TYPING AREA -->
     <section class="typing-area">
       <div
         id="typing-text"
@@ -69,14 +75,12 @@
       </div>
     </section>
 
-    <!-- ACTION BUTTONS -->
     <section class="actions">
-        <button id="restart-btn" disabled>Restart</button>
+      <button id="restart-btn">Restart</button>
     </section>
 
   </main>
 
-  <!-- RESULT PAGE -->
   <section id="result-page" class="result-page hidden">
 
     <div class="result-card">
@@ -114,7 +118,6 @@
 
   </section>
 
-  <!-- JAVASCRIPT -->
   <script src="script.js"></script>
 
 </body>

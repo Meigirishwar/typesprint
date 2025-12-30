@@ -9,7 +9,7 @@
 
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #0f172a; /* dark navy */
+  background: #0f172a;
   color: #e5e7eb;
   line-height: 1.5;
 }
@@ -34,7 +34,7 @@ body {
 .app-container {
   max-width: 820px;
   margin: 0 auto;
-  background: #020617; /* deep dark */
+  background: #020617;
   padding: 28px;
   border-radius: 12px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
@@ -57,6 +57,7 @@ body {
   color: #cbd5f5;
 }
 
+.word-count select,
 .difficulty-select select {
   padding: 6px 10px;
   font-size: 14px;
@@ -100,7 +101,7 @@ body {
    Characters
    ========================= */
 .char {
-  opacity: 0.5;
+  opacity: 0.45;
 }
 
 .char.current {
@@ -111,28 +112,12 @@ body {
 
 .char.correct {
   color: #22c55e;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
 .char.incorrect {
   color: #ef4444;
   opacity: 1;
-}
-
-.char.extra {
-  color: #fb923c;
-  opacity: 1;
-}
-
-/* =========================
-   Stats (temporary)
-   ========================= */
-.stats {
-  display: flex;
-  justify-content: space-between;
-  margin: 18px 0;
-  font-weight: 500;
-  color: #cbd5f5;
 }
 
 /* =========================
@@ -141,6 +126,7 @@ body {
 .actions {
   display: flex;
   gap: 12px;
+  margin-top: 18px;
 }
 
 .actions button {
@@ -154,67 +140,17 @@ body {
   transition: background 0.2s ease;
 }
 
-.actions button:hover:not(:disabled) {
+.actions button:hover {
   background: #1d4ed8;
 }
 
-.actions button:disabled {
-  background: #334155;
-  cursor: not-allowed;
-}
 /* =========================
-   RESULT PAGE
+   Result Page
    ========================= */
-
 .hidden {
-  display: none;
+  display: none !important;
 }
 
-.result-box {
-  background: #111827;
-  padding: 30px;
-  border-radius: 12px;
-  color: #e5e7eb;
-}
-
-.result-main {
-  display: flex;
-  justify-content: center;
-  gap: 60px;
-  margin-bottom: 20px;
-}
-
-.result-label {
-  font-size: 14px;
-  color: #9ca3af;
-}
-
-.result-value {
-  font-size: 48px;
-  font-weight: bold;
-  color: #facc15;
-}
-
-.result-sub {
-  font-size: 14px;
-  color: #9ca3af;
-  margin-bottom: 20px;
-}
-
-.result-actions button {
-  padding: 10px 18px;
-  margin: 0 8px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  background: #2563eb;
-  color: white;
-}
-.hidden {
-  display: none;
-}
-
-/* RESULT PAGE */
 .result-page {
   position: fixed;
   inset: 0;
@@ -266,10 +202,3 @@ body {
   color: white;
   cursor: pointer;
 }
-.result-page.hidden {
-  display: none !important;
-}
-#restart-btn {
-  display: none;
-}
-

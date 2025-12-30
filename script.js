@@ -1,6 +1,7 @@
 console.log("script.js loaded");
 
 document.addEventListener("DOMContentLoaded", () => {
+
   /* =========================
      DOM ELEMENTS
   ========================= */
@@ -8,7 +9,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const resultPage = document.getElementById("result-page");
   const typingText = document.getElementById("typing-text");
   const timeDisplay = document.getElementById("time");
+  const timerSection = document.getElementById("timer");
   const restartBtn = document.getElementById("restart-btn");
+  const retryBtn = document.getElementById("retry-btn");
 
   const resultWpm = document.getElementById("result-wpm");
   const resultAccuracy = document.getElementById("result-accuracy");
@@ -19,46 +22,38 @@ document.addEventListener("DOMContentLoaded", () => {
   const wordCountSelect = document.getElementById("word-count");
 
   /* =========================
-     INITIAL UI
-  ========================= */
-  resultPage.classList.add("hidden");
-  appContainer.classList.remove("hidden");
-  restartBtn.style.display = "none";
-
-  /* =========================
      WORD POOL
   ========================= */
   const WORD_POOL = [
     "the","and","to","of","is","you","that","it","in","for",
     "on","with","as","are","this","but","be","have","not",
     "from","they","we","say","her","she","or","will","my",
-    "one","all","would","there","their","time","people","way",
-    "day","man","world","school","state","family","student"
+    "one","all","would","there","their","time","people","way"
   ];
 
   /* =========================
      STATE
   ========================= */
-  let isRunning = false;
-  let timer = null;
-  let timeLeft = 60;
+  let mode = "time";
+  let wordLimit = 10;
+  let text = "";
+  let index = 0;
 
-  let currentIndex = 0;
   let correct = 0;
   let incorrect = 0;
 
-  let mode = "time";
-  let wordLimit = 10;
-  let currentText = "";
+  let isRunningunning = false;
+  let timer = null;
+  let timeLeft = 60;
+  let startTime = 0;
 
   /* =========================
      SETTINGS
   ========================= */
   function updateSettings() {
-    modeRadios.forEach(radio => {
-      if (radio.checked) mode = radio.value;
-    });
-    wordLimit = parseInt(wordCountSelect.value);
+    modeRadios.forEach(r => r.checked && (mode = r.value));
+    wordLimit = +wordCountSelect.value;
+    timerSection.style.display = mode === "time" ? "block" : "none";
   }
 
   /* =========================
@@ -70,33 +65,39 @@ document.addEventListener("DOMContentLoaded", () => {
     ).join(" ");
   }
 
-  function generateSentence() {
-    return generateWords(12);
+  function generateText() {
+    return mode === "words"
+      ? generateWords(wordLimit)
+      : generateWords(200);
   }
 
   /* =========================
-     LOAD TEXT
+     RESET / LOAD
   ========================= */
   function loadText() {
     updateSettings();
+    clearInterval(timer);
 
-    typingText.innerHTML = "";
-    currentIndex = 0;
+    isRunning = false;
+    index = 0;
     correct = 0;
     incorrect = 0;
 
-    currentText =
-      mode === "words"
-        ? generateWords(wordLimit)
-        : generateSentence();
+    timeLeft = 60;
+    timeDisplay.textContent = timeLeft;
 
-    currentText.split("").forEach((char, i) => {
+    typingText.innerHTML = "";
+    text = generateText();
+
+    text.split("").forEach((char, i) => {
       const span = document.createElement("span");
       span.textContent = char;
       span.classList.add("char");
       if (i === 0) span.classList.add("current");
       typingText.appendChild(span);
     });
+
+    restartBtn.style.display = "none";
   }
 
   /* =========================
@@ -106,6 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isRunning) return;
 
     isRunning = true;
+    startTime = Date.now();
     restartBtn.style.display = "inline-block";
 
     if (mode === "time") {
@@ -125,57 +127,49 @@ document.addEventListener("DOMContentLoaded", () => {
     isRunning = false;
 
     const totalTyped = correct + incorrect;
-    const accuracy =
-      totalTyped === 0 ? 0 : Math.round((correct / totalTyped) * 100);
+    const accuracy = totalTyped === 0
+      ? 0
+      : Math.round((correct / totalTyped) * 100);
 
-    const minutes =
-      mode === "time" ? 60 / 60 : (Date.now() - startTime) / 60000;
-
-    const wpm =
-      minutes > 0 ? Math.round((correct / 5) / minutes) : 0;
+    const minutes = (Date.now() - startTime) / 60000;
+    const wpm = minutes > 0
+      ? Math.round((correct / 5) / minutes)
+      : 0;
 
     resultWpm.textContent = wpm;
     resultAccuracy.textContent = accuracy + "%";
-    charSummary.textContent = `${correct} / ${incorrect} / 0 / 0`;
-    resultTime.textContent = mode === "time" ? "60s" : "-";
+    charSummary.textContent = `${correct} / ${incorrect}`;
+    resultTime.textContent =
+      mode === "time" ? "60s" : `${Math.round(minutes * 60)}s`;
 
     appContainer.classList.add("hidden");
     resultPage.classList.remove("hidden");
   }
 
-  let startTime = 0;
-
   /* =========================
      KEY HANDLER
   ========================= */
   window.addEventListener("keydown", (e) => {
-    if (!isRunning) {
-      startTime = Date.now();
-      startTest();
-    }
+    if (!isRunning) startTest();
 
     const chars = typingText.querySelectorAll(".char");
 
-    // BACKSPACE
+    /* BACKSPACE — VISUAL ONLY */
     if (e.key === "Backspace") {
-      if (currentIndex === 0) return;
+      if (index === 0) return;
 
-      currentIndex--;
-      const char = chars[currentIndex];
-
-      if (char.classList.contains("correct")) correct--;
-      if (char.classList.contains("incorrect")) incorrect--;
-
-      char.classList.remove("correct", "incorrect");
+      index--;
       chars.forEach(c => c.classList.remove("current"));
-      char.classList.add("current");
+      chars[index].classList.add("current");
+
+      // DO NOT change correct / incorrect counts
+      chars[index].classList.remove("correct", "incorrect");
       return;
     }
 
     if (e.key.length !== 1) return;
-    e.preventDefault();
 
-    const currentChar = chars[currentIndex];
+    const currentChar = chars[index];
     if (!currentChar) return;
 
     if (e.key === currentChar.textContent) {
@@ -187,40 +181,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     currentChar.classList.remove("current");
-    currentIndex++;
+    index++;
 
-    // WORDS MODE: END AT LAST CHARACTER
-    if (mode === "words" && currentIndex === currentText.length) {
+    if (mode === "words" && index === text.length) {
       endTest();
       return;
     }
 
-    // TIME MODE: LOAD NEW SENTENCE
-    if (mode === "time" && currentIndex === currentText.length) {
+    if (mode === "time" && index === text.length) {
       loadText();
+      startTest();
       return;
     }
 
-    if (chars[currentIndex]) {
-      chars[currentIndex].classList.add("current");
+    if (chars[index]) {
+      chars[index].classList.add("current");
     }
   });
 
   /* =========================
-     RESTART
+     BUTTONS
   ========================= */
-  restartBtn.addEventListener("click", () => {
-    clearInterval(timer);
-    timeLeft = 60;
-    timeDisplay.textContent = timeLeft;
-    restartBtn.style.display = "none";
-    isRunning = false;
+  restartBtn.addEventListener("click", loadText);
+  retryBtn.addEventListener("click", () => {
+    resultPage.classList.add("hidden");
+    appContainer.classList.remove("hidden");
     loadText();
   });
 
-  /* =========================
-     SETTINGS CHANGE → RELOAD
-  ========================= */
   modeRadios.forEach(r => r.addEventListener("change", loadText));
   wordCountSelect.addEventListener("change", loadText);
 
