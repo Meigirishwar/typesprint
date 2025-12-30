@@ -1,101 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>TypeSprint</title>
+  <meta charset="UTF-8" />
+  <title>⌨️ TypeSprint</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
     rel="stylesheet"
-  >
+  />
 
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
+  <!-- HEADER -->
   <header class="app-header">
-    <h1>TypeSprint</h1>
+    <h1>
+      <span class="logo-icon">⌨️</span>
+      <span class="logo-text">TypeSprint</span>
+    </h1>
   </header>
 
+  <!-- MAIN -->
   <main class="app-container">
 
-    <section class="controls">
+    <!-- PREMIUM TOP BAR -->
+    <section class="controls premium-bar">
 
-      <div class="mode-select">
-        <label>
-          <input type="radio" name="mode" value="time" checked>
-          Time
-        </label>
-        <label>
-          <input type="radio" name="mode" value="words">
-          Words
-        </label>
-      </div>
+      <!-- LEFT GROUP -->
+      <div class="controls-left">
 
-      <!-- WORD COUNT (Words mode only) -->
-      <div class="word-count">
-        <label>
-          Words:
-          <select id="word-count">
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
+        <!-- MODE TOGGLE -->
+        <div class="mode-toggle">
+          <button class="mode-btn active" data-mode="time">Time</button>
+          <button class="mode-btn" data-mode="words">Words</button>
+        </div>
+
+        <!-- TEXT TYPE -->
+        <div class="text-type">
+          <select id="text-type">
+            <option value="words">Words</option>
+            <option value="punctuation">Punctuation</option>
+            <option value="numbers">Numbers</option>
+            <option value="mixed">Mixed</option>
           </select>
-        </label>
-      </div>
+        </div>
 
-      <!-- TIME COUNT (Time mode only) -->
-      <div class="time-count">
-        <label>
-          Time:
+        <!-- COUNT -->
+        <div class="count-select">
+
+          <!-- Time mode -->
           <select id="time-count">
             <option value="15">15s</option>
             <option value="30">30s</option>
-            <option value="45">45s</option>
             <option value="60" selected>60s</option>
             <option value="120">120s</option>
           </select>
-        </label>
-      </div>
 
-      <div class="difficulty-select">
-        <label>
-          Difficulty:
+          <!-- Words mode -->
+          <select id="word-count" class="hidden">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+
+        </div>
+
+        <!-- DIFFICULTY -->
+        <div class="difficulty-select">
           <select id="difficulty">
             <option value="easy">Easy</option>
             <option value="medium">Medium</option>
             <option value="hard">Hard</option>
           </select>
-        </label>
+        </div>
+
       </div>
 
+      <!-- TIMER / STOPWATCH -->
+      <div class="top-timer" id="top-timer">
+        0.0s
+      </div>
+
+      <!-- RESTART -->
+      <button id="restart-btn" class="icon-btn" title="Restart">↻</button>
+
     </section>
 
-    <section id="timer" class="timer">
-      <span>Time:</span>
-      <strong id="time">60</strong>s
-    </section>
-
+    <!-- TYPING AREA -->
     <section class="typing-area">
-      <div
-        id="typing-text"
-        class="typing-text"
-        tabindex="0"
-        aria-label="Typing test area"
-      >
-        Loading text...
+      <div class="typing-wrapper">
+        <div
+          id="typing-text"
+          class="typing-text"
+          tabindex="0"
+          aria-label="Typing test area"
+        >
+          Loading text...
+        </div>
       </div>
-    </section>
-
-    <section class="actions">
-      <button id="restart-btn">Restart</button>
     </section>
 
   </main>
 
+  <!-- RESULT PAGE -->
   <section id="result-page" class="result-page hidden">
 
     <div class="result-card">
@@ -115,9 +127,8 @@
       <div class="result-secondary">
         <div>
           <span class="label">characters</span>
-          <span id="char-summary">0 / 0 / 0 / 0</span>
+          <span id="char-summary">0 / 0</span>
         </div>
-
         <div>
           <span class="label">time</span>
           <span id="result-time">0s</span>
@@ -134,6 +145,5 @@
   </section>
 
   <script src="script.js"></script>
-
 </body>
 </html>
