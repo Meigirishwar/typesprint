@@ -202,3 +202,11 @@ body {
   color: white;
   cursor: pointer;
 }
+.time-count select {
+  padding: 6px 10px;
+  font-size: 14px;
+  background: #020617;
+  color: #e5e7eb;
+  border: 1px solid #334155;
+  border-radius: 6px;
+}

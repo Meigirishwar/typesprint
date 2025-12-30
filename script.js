@@ -3,158 +3,178 @@ console.log("script.js loaded");
 document.addEventListener("DOMContentLoaded", () => {
 
   /* =========================
-     DOM ELEMENTS
+     CONFIG
   ========================= */
-  const appContainer = document.querySelector(".app-container");
+  const testConfig = {
+    type: "time",        // time | words
+    duration: 60,        // seconds
+    wordCount: 10,       // words
+    difficulty: "easy",
+    punctuation: false
+  };
+
+  /* =========================
+     DOM
+  ========================= */
+  const app = document.querySelector(".app-container");
   const resultPage = document.getElementById("result-page");
   const typingText = document.getElementById("typing-text");
-  const timeDisplay = document.getElementById("time");
+
   const timerSection = document.getElementById("timer");
-  const restartBtn = document.getElementById("restart-btn");
-  const retryBtn = document.getElementById("retry-btn");
+  const timeEl = document.getElementById("time");
 
   const resultWpm = document.getElementById("result-wpm");
   const resultAccuracy = document.getElementById("result-accuracy");
   const charSummary = document.getElementById("char-summary");
   const resultTime = document.getElementById("result-time");
+  const retryBtn = document.getElementById("retry-btn");
 
   const modeRadios = document.querySelectorAll('input[name="mode"]');
-  const wordCountSelect = document.getElementById("word-count");
+  const wordSelect = document.getElementById("word-count");
+  const timeSelect = document.getElementById("time-count");
+  const difficultySelect = document.getElementById("difficulty");
+
+  const wordCountBox = document.querySelector(".word-count");
+  const timeCountBox = document.querySelector(".time-count");
 
   /* =========================
-     WORD POOL
+     WORD POOLS
   ========================= */
-  const WORD_POOL = [
-    "the","and","to","of","is","you","that","it","in","for",
-    "on","with","as","are","this","but","be","have","not",
-    "from","they","we","say","her","she","or","will","my",
-    "one","all","would","there","their","time","people","way"
-  ];
+  const WORD_POOLS = {
+    easy: [
+      "the","and","to","of","is","you","that","it","in","for",
+      "on","with","as","are","this","but","be","have","not"
+    ],
+    medium: [
+      "people","govern","interest","system","process",
+      "require","develop","support","control","public"
+    ],
+    hard: [
+      "phenomenon","ubiquitous","conscientious","meticulous",
+      "paradigmatic","juxtaposition","idiosyncratic"
+    ]
+  };
 
   /* =========================
      STATE
   ========================= */
-  let mode = "time";
-  let wordLimit = 10;
   let text = "";
   let index = 0;
-
   let correct = 0;
   let incorrect = 0;
+  let started = false;
 
-  let isRunningunning = false;
   let timer = null;
-  let timeLeft = 60;
+  let timeLeft = testConfig.duration;
   let startTime = 0;
 
   /* =========================
-     SETTINGS
+     TEXT ENGINE
   ========================= */
-  function updateSettings() {
-    modeRadios.forEach(r => r.checked && (mode = r.value));
-    wordLimit = +wordCountSelect.value;
-    timerSection.style.display = mode === "time" ? "block" : "none";
+  function randomWord() {
+    const pool = WORD_POOLS[testConfig.difficulty];
+    return pool[Math.floor(Math.random() * pool.length)];
   }
 
-  /* =========================
-     TEXT GENERATION
-  ========================= */
   function generateWords(count) {
-    return Array.from({ length: count }, () =>
-      WORD_POOL[Math.floor(Math.random() * WORD_POOL.length)]
-    ).join(" ");
+    return Array.from({ length: count }, randomWord).join(" ");
   }
 
   function generateText() {
-    return mode === "words"
-      ? generateWords(wordLimit)
-      : generateWords(200);
+    if (testConfig.type === "words") {
+      return generateWords(testConfig.wordCount);
+    }
+    return generateWords(200);
+  }
+
+  function renderText() {
+    typingText.innerHTML = "";
+    text.split("").forEach((ch, i) => {
+      const span = document.createElement("span");
+      span.textContent = ch;
+      span.className = "char";
+      if (i === 0) span.classList.add("current");
+      typingText.appendChild(span);
+    });
   }
 
   /* =========================
-     RESET / LOAD
+     TIMER ENGINE
   ========================= */
-  function loadText() {
-    updateSettings();
-    clearInterval(timer);
+  function startTimer() {
+    if (testConfig.type !== "time") return;
 
-    isRunning = false;
+    timer = setInterval(() => {
+      timeLeft--;
+      timeEl.textContent = timeLeft;
+      if (timeLeft <= 0) endTest();
+    }, 1000);
+  }
+
+  /* =========================
+     TEST CONTROL
+  ========================= */
+  function resetTest() {
+    clearInterval(timer);
+    started = false;
+
     index = 0;
     correct = 0;
     incorrect = 0;
 
-    timeLeft = 60;
-    timeDisplay.textContent = timeLeft;
+    timeLeft = testConfig.duration;
+    timeEl.textContent = timeLeft;
 
-    typingText.innerHTML = "";
     text = generateText();
+    renderText();
 
-    text.split("").forEach((char, i) => {
-      const span = document.createElement("span");
-      span.textContent = char;
-      span.classList.add("char");
-      if (i === 0) span.classList.add("current");
-      typingText.appendChild(span);
-    });
+    /* UI TOGGLES */
+    timerSection.style.display =
+      testConfig.type === "time" ? "block" : "none";
 
-    restartBtn.style.display = "none";
+    timeCountBox.style.display =
+      testConfig.type === "time" ? "block" : "none";
+
+    wordCountBox.style.display =
+      testConfig.type === "words" ? "block" : "none";
   }
 
-  /* =========================
-     START TEST
-  ========================= */
   function startTest() {
-    if (isRunning) return;
-
-    isRunning = true;
+    if (started) return;
+    started = true;
     startTime = Date.now();
-    restartBtn.style.display = "inline-block";
-
-    if (mode === "time") {
-      timer = setInterval(() => {
-        timeLeft--;
-        timeDisplay.textContent = timeLeft;
-        if (timeLeft <= 0) endTest();
-      }, 1000);
-    }
+    startTimer();
   }
 
-  /* =========================
-     END TEST
-  ========================= */
   function endTest() {
     clearInterval(timer);
-    isRunning = false;
+    started = false;
 
-    const totalTyped = correct + incorrect;
-    const accuracy = totalTyped === 0
-      ? 0
-      : Math.round((correct / totalTyped) * 100);
-
+    const total = correct + incorrect;
+    const accuracy = total ? Math.round((correct / total) * 100) : 0;
     const minutes = (Date.now() - startTime) / 60000;
-    const wpm = minutes > 0
-      ? Math.round((correct / 5) / minutes)
-      : 0;
+    const wpm = minutes ? Math.round((correct / 5) / minutes) : 0;
 
     resultWpm.textContent = wpm;
     resultAccuracy.textContent = accuracy + "%";
     charSummary.textContent = `${correct} / ${incorrect}`;
     resultTime.textContent =
-      mode === "time" ? "60s" : `${Math.round(minutes * 60)}s`;
+      testConfig.type === "time"
+        ? `${testConfig.duration}s`
+        : `${Math.round(minutes * 60)}s`;
 
-    appContainer.classList.add("hidden");
+    app.classList.add("hidden");
     resultPage.classList.remove("hidden");
   }
 
   /* =========================
-     KEY HANDLER
+     INPUT ENGINE
   ========================= */
-  window.addEventListener("keydown", (e) => {
-    if (!isRunning) startTest();
+  window.addEventListener("keydown", e => {
+    if (!started) startTest();
 
     const chars = typingText.querySelectorAll(".char");
 
-    /* BACKSPACE — VISUAL ONLY */
     if (e.key === "Backspace") {
       if (index === 0) return;
 
@@ -162,58 +182,68 @@ document.addEventListener("DOMContentLoaded", () => {
       chars.forEach(c => c.classList.remove("current"));
       chars[index].classList.add("current");
 
-      // DO NOT change correct / incorrect counts
-      chars[index].classList.remove("correct", "incorrect");
+      /* visual only – mistake still counts */
+      chars[index].classList.remove("correct","incorrect");
       return;
     }
 
     if (e.key.length !== 1) return;
 
-    const currentChar = chars[index];
-    if (!currentChar) return;
+    const current = chars[index];
+    if (!current) return;
 
-    if (e.key === currentChar.textContent) {
-      currentChar.classList.add("correct");
+    if (e.key === current.textContent) {
+      current.classList.add("correct");
       correct++;
     } else {
-      currentChar.classList.add("incorrect");
+      current.classList.add("incorrect");
       incorrect++;
     }
 
-    currentChar.classList.remove("current");
+    current.classList.remove("current");
     index++;
 
-    if (mode === "words" && index === text.length) {
+    if (testConfig.type === "words" && index === text.length) {
       endTest();
       return;
     }
 
-    if (mode === "time" && index === text.length) {
-      loadText();
-      startTest();
-      return;
-    }
-
-    if (chars[index]) {
-      chars[index].classList.add("current");
-    }
+    if (chars[index]) chars[index].classList.add("current");
   });
 
   /* =========================
-     BUTTONS
+     UI → CONFIG
   ========================= */
-  restartBtn.addEventListener("click", loadText);
-  retryBtn.addEventListener("click", () => {
-    resultPage.classList.add("hidden");
-    appContainer.classList.remove("hidden");
-    loadText();
+  modeRadios.forEach(r =>
+    r.addEventListener("change", () => {
+      testConfig.type = r.value;
+      resetTest();
+    })
+  );
+
+  wordSelect.addEventListener("change", () => {
+    testConfig.wordCount = +wordSelect.value;
+    resetTest();
   });
 
-  modeRadios.forEach(r => r.addEventListener("change", loadText));
-  wordCountSelect.addEventListener("change", loadText);
+  timeSelect.addEventListener("change", () => {
+    testConfig.duration = +timeSelect.value;
+    resetTest();
+  });
+
+  difficultySelect.addEventListener("change", () => {
+    testConfig.difficulty = difficultySelect.value;
+    resetTest();
+  });
+
+  retryBtn.addEventListener("click", () => {
+    resultPage.classList.add("hidden");
+    app.classList.remove("hidden");
+    resetTest();
+  });
 
   /* =========================
      INIT
   ========================= */
-  loadText();
+  resetTest();
 });
