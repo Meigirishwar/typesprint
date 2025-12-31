@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <title>⌨️ TypeSprint</title>
 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -24,70 +26,60 @@
     </h1>
   </header>
 
-  <!-- MAIN -->
-  <main class="app-container">
+  <!-- MAIN APP -->
+  <main class="app-container" id="app">
 
-    <!-- PREMIUM TOP BAR -->
+    <!-- TOP CONTROLS -->
     <section class="controls premium-bar">
 
-      <!-- LEFT GROUP -->
+      <!-- LEFT -->
       <div class="controls-left">
 
-        <!-- MODE TOGGLE -->
+        <!-- MODE -->
         <div class="mode-toggle">
           <button class="mode-btn active" data-mode="time">Time</button>
           <button class="mode-btn" data-mode="words">Words</button>
         </div>
 
         <!-- TEXT TYPE -->
-        <div class="text-type">
-          <select id="text-type">
-            <option value="words">Words</option>
-            <option value="punctuation">Punctuation</option>
-            <option value="numbers">Numbers</option>
-            <option value="mixed">Mixed</option>
-          </select>
-        </div>
+        <select id="text-type">
+          <option value="words">Words</option>
+          <option value="punctuation">Punctuation</option>
+          <option value="numbers">Numbers</option>
+          <option value="mixed">Mixed</option>
+        </select>
 
         <!-- COUNT -->
-        <div class="count-select">
+        <select id="time-count">
+          <option value="15">15s</option>
+          <option value="30">30s</option>
+          <option value="60" selected>60s</option>
+          <option value="120">120s</option>
+        </select>
 
-          <!-- Time mode -->
-          <select id="time-count">
-            <option value="15">15s</option>
-            <option value="30">30s</option>
-            <option value="60" selected>60s</option>
-            <option value="120">120s</option>
-          </select>
-
-          <!-- Words mode -->
-          <select id="word-count" class="hidden">
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
-
-        </div>
+        <select id="word-count" class="hidden">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
 
         <!-- DIFFICULTY -->
-        <div class="difficulty-select">
-          <select id="difficulty">
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
-          </select>
-        </div>
+        <select id="difficulty">
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
 
       </div>
 
-      <!-- TIMER / STOPWATCH -->
-      <div class="top-timer" id="top-timer">
-        0.0s
-      </div>
+      <!-- TIMER -->
+      <div class="top-timer" id="top-timer">0.0s</div>
 
-      <!-- RESTART -->
-      <button id="restart-btn" class="icon-btn" title="Restart">↻</button>
+      <!-- ACTIONS -->
+      <div class="controls-right">
+        <button id="restart-btn" class="icon-btn" title="Restart">↻</button>
+      </div>
 
     </section>
 
@@ -98,6 +90,7 @@
           id="typing-text"
           class="typing-text"
           tabindex="0"
+          role="textbox"
           aria-label="Typing test area"
         >
           Loading text...
@@ -108,41 +101,54 @@
   </main>
 
   <!-- RESULT PAGE -->
-  <section id="result-page" class="result-page hidden">
+<section id="result-page" class="result-page hidden">
 
-    <div class="result-card">
+  <div class="result-card">
 
-      <div class="result-main">
-        <div class="result-block">
-          <div class="label">wpm</div>
-          <div id="result-wpm" class="value">0</div>
-        </div>
+    <!-- HERO -->
+    <div class="result-hero">
+      <div id="result-wpm" class="result-wpm">0</div>
+      <div class="result-label">Words Per Minute</div>
+    </div>
 
-        <div class="result-block">
-          <div class="label">acc</div>
-          <div id="result-accuracy" class="value">0%</div>
-        </div>
-      </div>
+    <!-- STATS GRID -->
+    <div class="result-stats">
 
-      <div class="result-secondary">
-        <div>
-          <span class="label">characters</span>
-          <span id="char-summary">0 / 0</span>
-        </div>
-        <div>
-          <span class="label">time</span>
-          <span id="result-time">0s</span>
+      <div class="stat-box">
+        <div class="stat-title">Accuracy</div>
+        <div class="stat-value" id="result-accuracy">0%</div>
+        <div class="accuracy-bar">
+          <div class="accuracy-fill" id="accuracy-fill"></div>
         </div>
       </div>
 
-      <div class="result-actions">
-        <button id="retry-btn">Retry</button>
-        <button id="newtest-btn">New Test</button>
+      <div class="stat-box">
+        <div class="stat-title">Characters</div>
+        <div class="stat-value" id="char-summary">0 / 0</div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-title">Time</div>
+        <div class="stat-value" id="result-time">0s</div>
       </div>
 
     </div>
 
-  </section>
+    <!-- PERFORMANCE BADGE -->
+    <div class="performance-badge" id="performance-badge">
+      Keep practicing 💪
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="result-actions">
+      <button id="retry-btn">Retry</button>
+      <button id="newtest-btn">New Test</button>
+    </div>
+
+  </div>
+
+</section>
+
 
   <script src="script.js"></script>
 </body>
