@@ -6,11 +6,9 @@ document.addEventListener("DOMContentLoaded", () => {
      CONFIG
   ========================= */
   const config = {
-    mode: "time",
-    textType: "words",
+    mode: "time", // time | words
     duration: 60,
-    wordCount: 10,
-    difficulty: "easy"
+    wordCount: 10
   };
 
   /* =========================
@@ -25,24 +23,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const charSummary = document.getElementById("char-summary");
   const resultTime = document.getElementById("result-time");
 
-  const retryBtn = document.getElementById("retry-btn");
   const restartBtn = document.getElementById("restart-btn");
 
   const modeButtons = document.querySelectorAll(".mode-btn");
-  const textTypeSelect = document.getElementById("text-type");
   const wordSelect = document.getElementById("word-count");
   const timeSelect = document.getElementById("time-count");
-  const difficultySelect = document.getElementById("difficulty");
   const topTimer = document.getElementById("top-timer");
 
   /* =========================
-     WORD POOLS
+     WORD POOL
   ========================= */
-  const EASY = ["the","and","to","of","is","you","it","in","for","on","as","are","but","be","not","by","at","or","an","if","we","they","he","she","can","will","do","did","make","see","go","say","get","give","find","think","know"];
-  const MEDIUM = ["people","system","process","support","develop","control","important","experience","understand","information","community","education","business","creative","analysis","performance","solution","design"];
-  const HARD = ["phenomenon","ubiquitous","meticulous","paradigmatic","idiosyncratic","juxtaposition","conscientious","counterintuitive","sustainability","epistemology","cryptographic","multidimensional"];
-  const NUMBERS = ["0","1","2","3","4","5","6","7","8","9"];
-  const PUNCT = [",",".","?","!",";"];
+  const WORDS = [
+    "the","and","to","of","is","you","it","in","for","on","as","are","but","be",
+    "not","by","at","or","an","if","we","they","he","she","can","will","do",
+    "make","see","go","say","get","give","find","think","know"
+  ];
 
   /* =========================
      STATE
@@ -53,46 +48,74 @@ document.addEventListener("DOMContentLoaded", () => {
   let incorrect = 0;
   let timer = null;
   let timeLeft = config.duration;
-  let startTime = 0;
+  let startTime = null;
+  let wordsTyped = 0;
+
+  // GRAPH DATA
+  let graphData = []; // {t, wpm, errors}
 
   /* =========================
      HELPERS
   ========================= */
   const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 
-  function getBaseWord() {
-    const r = Math.random();
-    if (config.difficulty === "easy") return r < 0.85 ? pick(EASY) : pick(MEDIUM);
-    if (config.difficulty === "medium") return r < 0.4 ? pick(EASY) : r < 0.8 ? pick(MEDIUM) : pick(HARD);
-    return r < 0.3 ? pick(MEDIUM) : pick(HARD);
-  }
-
-  function getToken() {
-    const r = Math.random();
-    if (config.textType === "punctuation") return r < 0.15 ? pick(PUNCT) : getBaseWord();
-    if (config.textType === "numbers") return r < 0.15 ? pick(NUMBERS) : getBaseWord();
-    if (config.textType === "mixed") {
-      if (r < 0.6) return getBaseWord();
-      if (r < 0.8) return pick(PUNCT);
-      return pick(NUMBERS);
-    }
-    return getBaseWord();
-  }
-
-  function generateText(words = 40) {
-    return Array.from({ length: words }, getToken).join(" ");
-  }
-
-  function getAllChars() {
-    return typingText.querySelectorAll(".char");
+  function generateLine(words = 12) {
+    return Array.from({ length: words }, () => pick(WORDS)).join(" ");
   }
 
   /* =========================
-     RENDER
+     TIME MODE (3 LINES)
   ========================= */
-  function renderText(text) {
+  function initTimeMode() {
     typingText.innerHTML = "";
-    text.split("").forEach((ch, i) => {
+    charIndex = 0;
+
+    for (let i = 0; i < 3; i++) addNewLine(i === 0);
+  }
+
+  function addNewLine(isFirst = false) {
+    const line = document.createElement("div");
+    line.className = "sentence";
+
+    generateLine().split("").forEach((ch, i) => {
+      const span = document.createElement("span");
+      span.textContent = ch;
+      span.className = "char";
+      if (isFirst && i === 0) span.classList.add("current");
+      line.appendChild(span);
+    });
+
+    typingText.appendChild(line);
+  }
+
+  function getCurrentLineChars() {
+    const first = typingText.querySelector(".sentence");
+    return first ? first.querySelectorAll(".char") : [];
+  }
+
+  function slideLine() {
+    const first = typingText.querySelector(".sentence");
+    if (!first) return;
+
+    first.classList.add("fade-out");
+
+    setTimeout(() => {
+      first.remove();
+      addNewLine();
+      charIndex = 0;
+      const chars = getCurrentLineChars();
+      if (chars[0]) chars[0].classList.add("current");
+    }, 250);
+  }
+
+  /* =========================
+     WORD MODE
+  ========================= */
+  function initWordsMode() {
+    typingText.innerHTML = "";
+    charIndex = 0;
+
+    generateLine(config.wordCount).split("").forEach((ch, i) => {
       const span = document.createElement("span");
       span.textContent = ch;
       span.className = "char";
@@ -107,23 +130,78 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =========================
-     TIMER
+     TIMER + GRAPH TRACKING
   ========================= */
   function startTimer() {
-    startTime = Date.now();
+    timer = setInterval(() => {
+      timeLeft--;
 
-    if (config.mode === "time") {
-      timer = setInterval(() => {
-        timeLeft--;
-        topTimer.textContent = `${timeLeft}s`;
-        if (timeLeft <= 0) endTest();
-      }, 1000);
-    } else {
-      timer = setInterval(() => {
-        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-        topTimer.textContent = `${elapsed}s`;
-      }, 100);
+      const elapsedSec = Math.floor((Date.now() - startTime) / 1000);
+      const mins = elapsedSec / 60 || 0.01;
+      const liveWpm = Math.round((correct / 5) / mins);
+
+      graphData.push({
+        t: elapsedSec,
+        wpm: liveWpm,
+        errors: incorrect
+      });
+
+      topTimer.textContent = `${timeLeft}s`;
+
+      if (timeLeft <= 0) endTest();
+    }, 1000);
+  }
+
+  /* =========================
+     GRAPH DRAW
+  ========================= */
+  function drawGraph() {
+    const canvas = document.getElementById("wpm-graph");
+    if (!canvas || graphData.length < 2) return;
+
+    const ctx = canvas.getContext("2d");
+    const w = canvas.width;
+    const h = canvas.height;
+    const pad = 40;
+
+    ctx.clearRect(0, 0, w, h);
+
+    const maxWpm = Math.max(...graphData.map(d => d.wpm), 10);
+    const maxT = graphData[graphData.length - 1].t || 1;
+
+    // GRID
+    ctx.strokeStyle = "rgba(255,255,255,0.08)";
+    for (let i = 0; i <= 4; i++) {
+      const y = pad + (i / 4) * (h - pad * 2);
+      ctx.beginPath();
+      ctx.moveTo(pad, y);
+      ctx.lineTo(w - pad, y);
+      ctx.stroke();
     }
+
+    // LINE
+    ctx.strokeStyle = "#9fe0d6";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+
+    graphData.forEach((d, i) => {
+      const x = pad + (d.t / maxT) * (w - pad * 2);
+      const y = h - pad - (d.wpm / maxWpm) * (h - pad * 2);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // ERROR DOTS
+    ctx.fillStyle = "#ef4444";
+    graphData.forEach(d => {
+      if (d.errors > 0) {
+        const x = pad + (d.t / maxT) * (w - pad * 2);
+        const y = h - pad - (d.wpm / maxWpm) * (h - pad * 2);
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
   }
 
   /* =========================
@@ -131,22 +209,27 @@ document.addEventListener("DOMContentLoaded", () => {
   ========================= */
   function resetTest() {
     clearInterval(timer);
+
     started = false;
+    charIndex = 0;
     correct = 0;
     incorrect = 0;
-    charIndex = 0;
+    wordsTyped = 0;
+    startTime = null;
+    graphData = [];
 
     if (config.mode === "time") {
       timeLeft = config.duration;
       topTimer.textContent = `${timeLeft}s`;
-      renderText(generateText(60));
+      initTimeMode();
+      wordSelect.classList.add("hidden");
+      timeSelect.classList.remove("hidden");
     } else {
-      topTimer.textContent = "0.0s";
-      renderText(generateText(config.wordCount));
+      topTimer.textContent = `0 / ${config.wordCount} words`;
+      initWordsMode();
+      timeSelect.classList.add("hidden");
+      wordSelect.classList.remove("hidden");
     }
-
-    wordSelect.classList.toggle("hidden", config.mode === "time");
-    timeSelect.classList.toggle("hidden", config.mode === "words");
 
     typingText.focus();
   }
@@ -154,52 +237,43 @@ document.addEventListener("DOMContentLoaded", () => {
   function startTest() {
     if (started) return;
     started = true;
-    startTimer();
+    startTime = Date.now();
+    if (config.mode === "time") startTimer();
   }
 
   function endTest() {
-  clearInterval(timer);
+    clearInterval(timer);
 
-  const mins = (Date.now() - startTime) / 60000 || 1 / 60;
-  const wpm = Math.round((correct / 5) / mins);
-  const accuracy = Math.round(
-    (correct / Math.max(1, correct + incorrect)) * 100
-  );
+    const elapsedMs = Date.now() - startTime;
+    const mins = elapsedMs / 60000 || 0.01;
 
-  // Numbers
-  resultWpm.textContent = wpm;
-  resultAccuracy.textContent = accuracy + "%";
-  charSummary.textContent = `${correct} / ${incorrect}`;
-  resultTime.textContent = `${Math.round(mins * 60)}s`;
+    resultWpm.textContent = Math.round((correct / 5) / mins);
+    resultAccuracy.textContent =
+      Math.round((correct / Math.max(1, correct + incorrect)) * 100) + "%";
+    charSummary.textContent = `${correct} / ${incorrect}`;
+    resultTime.textContent = `${Math.round(elapsedMs / 1000)}s`;
 
-  // Accuracy bar
-  const accuracyFill = document.getElementById("accuracy-fill");
-  if (accuracyFill) {
-    accuracyFill.style.width = accuracy + "%";
+    app.classList.add("hidden");
+    resultPage.classList.remove("hidden");
+
+    setTimeout(drawGraph, 100);
   }
-
-  // Performance badge
-  const badge = document.getElementById("performance-badge");
-  if (badge) {
-    if (wpm >= 80) badge.textContent = "🔥 Pro level typing!";
-    else if (wpm >= 50) badge.textContent = "💪 Great speed!";
-    else if (wpm >= 30) badge.textContent = "🙂 Good progress!";
-    else badge.textContent = "🌱 Keep practicing!";
-  }
-
-  // Show result page
-  app.classList.add("hidden");
-  resultPage.classList.remove("hidden");
-}
 
   /* =========================
-     INPUT
+     INPUT (SPACE SAFE)
   ========================= */
   window.addEventListener("keydown", e => {
+
+    if (e.key === " " || e.key === "Backspace") e.preventDefault();
+
     if (!started) startTest();
     if (e.key !== "Backspace" && e.key.length !== 1) return;
 
-    const chars = getAllChars();
+    const chars =
+      config.mode === "time"
+        ? getCurrentLineChars()
+        : typingText.querySelectorAll(".char");
+
     const current = chars[charIndex];
     if (!current) return;
 
@@ -219,36 +293,50 @@ document.addEventListener("DOMContentLoaded", () => {
       incorrect++;
     }
 
+    if (config.mode === "words" && e.key === " ") {
+      wordsTyped++;
+      topTimer.textContent = `${wordsTyped} / ${config.wordCount} words`;
+    }
+
     charIndex++;
+
+    if (config.mode === "time" && charIndex >= chars.length) {
+      slideLine();
+      return;
+    }
+
     setCaret(chars);
 
-    if (config.mode === "words" && charIndex >= chars.length) {
-      endTest();
-    }
+    if (config.mode === "words" && charIndex >= chars.length) endTest();
   });
 
   /* =========================
      UI EVENTS
   ========================= */
-  modeButtons.forEach(btn => btn.onclick = () => {
-    modeButtons.forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    config.mode = btn.dataset.mode;
-    resetTest();
+  modeButtons.forEach(btn => {
+    btn.onclick = () => {
+      modeButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      config.mode = btn.dataset.mode;
+      resetTest();
+    };
   });
 
-  textTypeSelect.onchange = () => { config.textType = textTypeSelect.value; resetTest(); };
-  wordSelect.onchange = () => { config.wordCount = +wordSelect.value; resetTest(); };
-  timeSelect.onchange = () => { config.duration = +timeSelect.value; resetTest(); };
-  difficultySelect.onchange = () => { config.difficulty = difficultySelect.value; resetTest(); };
+  wordSelect.onchange = () => {
+    config.wordCount = +wordSelect.value;
+    resetTest();
+  };
 
-  retryBtn.onclick = () => {
+  timeSelect.onchange = () => {
+    config.duration = +timeSelect.value;
+    resetTest();
+  };
+
+  restartBtn.onclick = () => {
     resultPage.classList.add("hidden");
     app.classList.remove("hidden");
     resetTest();
   };
-
-  restartBtn.onclick = resetTest;
 
   /* =========================
      INIT

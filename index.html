@@ -27,7 +27,7 @@
   </header>
 
   <!-- MAIN APP -->
-  <main class="app-container" id="app">
+  <main class="app-container">
 
     <!-- TOP CONTROLS -->
     <section class="controls premium-bar">
@@ -40,14 +40,6 @@
           <button class="mode-btn active" data-mode="time">Time</button>
           <button class="mode-btn" data-mode="words">Words</button>
         </div>
-
-        <!-- TEXT TYPE -->
-        <select id="text-type">
-          <option value="words">Words</option>
-          <option value="punctuation">Punctuation</option>
-          <option value="numbers">Numbers</option>
-          <option value="mixed">Mixed</option>
-        </select>
 
         <!-- COUNT -->
         <select id="time-count">
@@ -64,21 +56,14 @@
           <option value="100">100</option>
         </select>
 
-        <!-- DIFFICULTY -->
-        <select id="difficulty">
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
-        </select>
-
       </div>
 
       <!-- TIMER -->
-      <div class="top-timer" id="top-timer">0.0s</div>
+      <div class="top-timer" id="top-timer">0s</div>
 
-      <!-- ACTIONS -->
+      <!-- TOP RESTART -->
       <div class="controls-right">
-        <button id="restart-btn" class="icon-btn" title="Restart">↻</button>
+        <button id="top-restart-btn" class="icon-btn" title="Restart">↻</button>
       </div>
 
     </section>
@@ -101,54 +86,71 @@
   </main>
 
   <!-- RESULT PAGE -->
-<section id="result-page" class="result-page hidden">
+  <section id="result-page" class="result-page hidden">
 
-  <div class="result-card">
+    <div class="result-card result-pro">
 
-    <!-- HERO -->
-    <div class="result-hero">
-      <div id="result-wpm" class="result-wpm">0</div>
-      <div class="result-label">Words Per Minute</div>
-    </div>
+      <!-- TOP -->
+      <div class="result-top">
 
-    <!-- STATS GRID -->
-    <div class="result-stats">
+        <!-- LEFT STATS -->
+        <div class="result-left">
 
-      <div class="stat-box">
-        <div class="stat-title">Accuracy</div>
-        <div class="stat-value" id="result-accuracy">0%</div>
-        <div class="accuracy-bar">
-          <div class="accuracy-fill" id="accuracy-fill"></div>
+          <div class="big-stat stat" data-tip="Words per minute">
+            <span class="stat-label">wpm</span>
+            <span id="result-wpm" class="stat-value">0</span>
+          </div>
+
+          <div class="big-stat stat" data-tip="Typing accuracy">
+            <span class="stat-label">acc</span>
+            <span id="result-accuracy" class="stat-value">0%</span>
+          </div>
+
         </div>
+
+        <!-- GRAPH -->
+        <div class="result-graph">
+          <canvas id="wpm-graph" width="600" height="220"></canvas>
+        </div>
+
       </div>
 
-      <div class="stat-box">
-        <div class="stat-title">Characters</div>
-        <div class="stat-value" id="char-summary">0 / 0</div>
+      <!-- METRICS -->
+      <div class="result-metrics">
+
+        <div class="metric stat" data-tip="Correct / incorrect characters">
+          <span class="metric-label">characters</span>
+          <span id="char-summary" class="metric-value">0 / 0</span>
+        </div>
+
+        <div class="metric stat" data-tip="Raw speed without accuracy penalty">
+          <span class="metric-label">raw</span>
+          <span id="raw-wpm" class="metric-value">0</span>
+        </div>
+
+        <div class="metric stat" data-tip="Typing consistency">
+          <span class="metric-label">consistency</span>
+          <span id="consistency" class="metric-value">--%</span>
+        </div>
+
+        <div class="metric stat" data-tip="Total test duration">
+          <span class="metric-label">time</span>
+          <span id="result-time" class="metric-value">0s</span>
+        </div>
+
       </div>
 
-      <div class="stat-box">
-        <div class="stat-title">Time</div>
-        <div class="stat-value" id="result-time">0s</div>
+      <!-- ACTION -->
+      <div class="result-actions">
+        <button id="restart-btn">New Test</button>
       </div>
 
     </div>
 
-    <!-- PERFORMANCE BADGE -->
-    <div class="performance-badge" id="performance-badge">
-      Keep practicing 💪
-    </div>
+    <!-- GRAPH TOOLTIP -->
+    <div id="graph-tooltip"></div>
 
-    <!-- ACTIONS -->
-    <div class="result-actions">
-      <button id="retry-btn">Retry</button>
-      <button id="newtest-btn">New Test</button>
-    </div>
-
-  </div>
-
-</section>
-
+  </section>
 
   <script src="script.js"></script>
 </body>

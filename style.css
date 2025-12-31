@@ -378,3 +378,224 @@ select:hover {
   font-weight: 600;
   background: rgba(255,255,255,0.08);
 }
+/* =========================
+   Monkeytype-style Results
+========================= */
+.result-pro {
+  width: 90vw;
+  max-width: 1100px;
+}
+
+.result-top {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.result-left {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.big-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #94a3b8;
+  letter-spacing: 1px;
+}
+
+.stat-value {
+  font-size: 88px;
+  font-weight: 800;
+  color: #9fe0d6;
+}
+
+.result-graph {
+  height: 220px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.graph-placeholder {
+  color: #475569;
+  font-size: 14px;
+}
+
+/* Bottom metrics */
+.result-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 40px;
+  gap: 20px;
+}
+
+.metric {
+  text-align: center;
+}
+
+.metric-label {
+  display: block;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.metric-value {
+  font-size: 26px;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+/* Buttons */
+.result-actions {
+  margin-top: 36px;
+  text-align: center;
+}
+/* =========================
+   WPM Graph
+========================= */
+.result-graph canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.result-graph {
+  padding: 20px;
+}
+#graph-tooltip {
+  position: fixed;
+  background: rgba(15,23,42,0.95);
+  color: #e5e7eb;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  pointer-events: none;
+  display: none;
+}
+.stat {
+  position: relative;
+  cursor: help;
+}
+
+.stat:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #020617;
+  color: #e5e7eb;
+  padding: 6px 8px;
+  font-size: 11px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+/* =========================
+   Graph Visibility Fix
+========================= */
+.result-graph {
+  position: relative;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.04),
+      rgba(255,255,255,0.01)
+    );
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.result-graph canvas {
+  image-rendering: crisp-edges;
+}
+
+/* =========================
+   Graph Grid (Monkeytype feel)
+========================= */
+.result-graph::before {
+  content: "";
+  position: absolute;
+  inset: 20px;
+  background:
+    linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 60px 40px;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* =========================
+   Tooltip (Graph)
+========================= */
+#graph-tooltip {
+  z-index: 200;
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.6),
+    inset 0 0 0 1px rgba(255,255,255,0.08);
+}
+
+/* =========================
+   Result Stats Hover Explain
+========================= */
+.metric,
+.stat,
+.stat-box {
+  position: relative;
+  cursor: help;
+}
+
+.metric::after,
+.stat::after,
+.stat-box::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: 130%;
+  left: 50%;
+  transform: translateX(-50%) scale(0.96);
+
+  background: rgba(2,6,23,0.95);
+  color: #e5e7eb;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  white-space: nowrap;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.15s ease;
+}
+
+.metric:hover::after,
+.stat:hover::after,
+.stat-box:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+/* =========================
+   Emphasize Primary Numbers
+========================= */
+.stat-value,
+.metric-value {
+  color: #9fe0d6;
+}
+
+.stat-label,
+.metric-label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* =========================
+   Remove Visual Noise
+========================= */
+.graph-placeholder {
+  display: none;
+}
